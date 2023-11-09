@@ -1,0 +1,120 @@
+﻿@page "/"
+@using CarRental.Business.Classes
+@inject BookingManager bm
+
+<PageTitle>Car Rental App</PageTitle>
+<h1>Car Rental App</h1>
+
+<h3>Vehicles</h3>
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th>#</th>
+            <th>RegNo</th>
+            <th>Make</th>
+            <th>Odometer</th>
+            <th>Vehicle Type</th>
+            <th>Cost/Km</th>
+            <th>Cost/Day</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{ int i = 1; }
+        @foreach (var vehicle in bm.GetAllVehicles())
+        {
+            <tr @onclick="() => bm.SetStatusOfVehicle(vehicle, true)">
+                <td>@i</td>
+                <td>@vehicle.Registration</td>
+                <td>@vehicle.Make</td>
+                <td>@vehicle.GetOdometer()</td>
+                <td>@vehicle.VehicleType.ToString()</td>
+                <td>@vehicle.CostPerKilometer</td>
+                <td>@vehicle.CostPerDay</td>
+                <td>@vehicle.GetVehicleStatus().ToString()</td>
+            </tr>
+            i++;
+        }
+    </tbody>
+</table>
+
+<h3>Bookings</h3>
+<p>Klicka på bokning för att returna.</p>
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th>#</th>
+            <th>RegNo</th>
+            <th>Customer</th>
+            <th>Km Rented</th>
+            <th>Km Returned</th>
+            <th>Rented On</th>
+            <th>Returned On</th>
+            <th>Cost</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int a = 1;
+        }
+        @foreach (var booking in bm.GetAllBookings())
+        {
+            <tr @onclick="() => booking.ReturnVehicle()">
+                <td>@a</td>
+                <td>@booking.GetVehicleInfo().Registration</td>
+                <td>@booking.GetCustomerInfo().GetFullName()</td>
+                <td>@booking.KilometersRented</td>
+                <td>@booking.GetKilometersLeft() (used @booking.GetKilometersUsed())</td>
+                <td>@booking.GetDayRented().Date.ToString("yyyy/MM/dd")</td>
+                @if (booking.GetDayReturned() != 0)
+                {
+                    <td>@booking.GetDayRented().AddDays(booking.GetDayReturned()).ToString("yyyy/MM/dd") (@booking.GetDayReturned() days)</td>
+                } else
+                {
+                    <td>Vehicle still in use</td>
+                }
+                <td>@booking.GetCost()</td>
+                @if (booking.GetIsActive())
+                {
+                    <td>Open</td>
+                } else
+                {
+                    <td>Closed</td>
+                    
+                }
+
+            </tr>
+            a++;
+        }
+    </tbody>
+</table>
+
+<h3>Customers</h3>
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th>#</th>
+            <th>SSN</th>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int n = 1;
+        }
+        @foreach (var person in bm.GetAllPersons())
+        {
+            <tr>
+                <td>@n</td>
+                <td>@person.GetSocialSecurityNumber()</td>
+                <td>@person.GetFullName()</td>
+            </tr>
+            n++;
+        }
+    </tbody>
+</table>
+
+@code {
+
+}
